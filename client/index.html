@@ -166,73 +166,137 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="eight wide column">
-                                        <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
-                                            <div class="ui tiny header"><i class="protect icon"></i>Current Limits</div>
-                                            <div class="ui form">
-                                                <div class="field">
-                                                    <label>
-                                                        Maximum Discharge Current Cutoff
-                                                        <i class="help circle icon link" data-content="The maximum discharge current that can be delivered to the load before the output is disabled." data-offset="-12"></i>
-                                                    </label>
-                                                    <div class="ui right labeled input">
-                                                        <input name="maxCurrentCutoff" class="config-field" type="number">
-                                                        <div class="ui basic label">
-                                                            A
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="field">
-                                                    <label>
-                                                        Maximum Continuous Discharge Current
-                                                        <i class="help circle icon link" data-content="The maximum current allowed to be delivered to the load for an indefinite amount of time." data-offset="-12"></i>
-                                                    </label>
-                                                    <div class="ui right labeled input">
-                                                        <input name="maxContinuousCurrent" class="config-field" type="number">
-                                                        <div class="ui basic label">
-                                                            A
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="field">
-                                                    <label>
-                                                        Continuous Current Exceeding Cutoff Time
-                                                        <i class="help circle icon link" data-content="The amount of time that the current is allowed to exceed the maximum continuous current before the output is disabled." data-offset="-12"></i>
-                                                    </label>
-                                                    <div class="ui right labeled input">
-                                                        <input name="continuousCurrentCutoffTime" class="config-field" type="number">
-                                                        <div class="ui basic label">
-                                                            Seconds
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="field">
-                                                    <label>
-                                                        Continuous Current Exceeding Warning Time
-                                                        <i class="help circle icon link" data-content="The amount of time that the current is allowed to exceed the maximum continuous current before a warning is displayed.." data-offset="-12"></i>
-                                                    </label>
-                                                    <div class="ui right labeled input">
-                                                        <input name="continuousCurrentCutoffWarning" class="config-field" type="number">
-                                                        <div class="ui basic label">
-                                                            Seconds
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="field">
-                                                    <label>
-                                                        Maximum Charge Current
-                                                        <i class="help circle icon link" data-content="The maximum current that can be delivered into the battery from charging or regeneration before a warning is displayed." data-offset="-12"></i>
-                                                    </label>
-                                                    <div class="ui right labeled input">
-                                                        <input name="maxChargeCurrent" class="config-field" type="number">
-                                                        <div class="ui basic label">
-                                                            A
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-					</div>
-                                    </div>
+									<div class="stretched row">
+										<div class="eight wide column">
+											<div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+												<div class="ui tiny header"><i class="protect icon"></i>Current Limits</div>
+												<div class="ui form">
+													<div class="field">
+														<label>
+															Maximum Discharge Current Cutoff
+															<i class="help circle icon link" data-content="The maximum discharge current that can be delivered to the load before the output is disabled." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="maxCurrentCutoff" class="config-field" type="number">
+															<div class="ui basic label">
+																A
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Maximum Continuous Discharge Current
+															<i class="help circle icon link" data-content="The maximum current allowed to be delivered to the load for an indefinite amount of time." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="maxContinuousCurrent" class="config-field" type="number">
+															<div class="ui basic label">
+																A
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Continuous Current Exceeding Cutoff Time
+															<i class="help circle icon link" data-content="The amount of time that the current is allowed to exceed the maximum continuous current before the output is disabled." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="continuousCurrentCutoffTime" class="config-field" type="number">
+															<div class="ui basic label">
+																Seconds
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Continuous Current Exceeding Warning Time
+															<i class="help circle icon link" data-content="The amount of time that the current is allowed to exceed the maximum continuous current before a warning is displayed.." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="continuousCurrentCutoffWarning" class="config-field" type="number">
+															<div class="ui basic label">
+																Seconds
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Maximum Charge Current
+															<i class="help circle icon link" data-content="The maximum current that can be delivered into the battery from charging or regeneration before a warning is displayed." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="maxChargeCurrent" class="config-field" type="number">
+															<div class="ui basic label">
+																A
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									
+										<div class="eight wide column">
+											<div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+												<div class="ui tiny header"><i class="fire icon"></i>Temperatures Limits</div>
+												<div class="ui form">
+													<div class="field">
+														<label>
+															Board Temperature Warning
+															<i class="help circle icon link" data-content="If the board temperature reaches this temperature, a warning is triggered." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBoardWarning" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Board Temperature Cutoff
+															<i class="help circle icon link" data-content="If the board temperature reaches this temperature, the discharge is cut off." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBoardCutoff" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<div class="ui toogle checkbox">
+														<input class="config-field" type="checkbox" name="isTempSensor" tabindex="0" class="hidden">
+														<label>Battery Temperature sensor connected</label>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Battery Temperature Warning
+															<i class="help circle icon link" data-content="If the battery temperature reaches this temperature, a warning is triggered." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBattWarning" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Battery Temperature Cutoff
+															<i class="help circle icon link" data-content="If the battery temperature reaches this temperature, the discharge is cut off." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBattCutoff" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
                                 </div>
                                 <!--<div class="ui tab grid" style="margin-top: 0" data-tab="limits">-->
                                 <!--</div>-->
@@ -361,6 +425,30 @@
                             <div class="eight wide column">
                                 <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
                                     <div class="ui tiny header"><i class="volume up icon"></i>Buzzer Settings</div>
+										<div class="field">
+											<div class="ui toogle checkbox">
+												<input class="config-field" type="checkbox" name="enBuzzer" tabindex="0" class="hidden">
+												<label>Enable Buzzer</label>
+											</div>
+										</div>
+										
+                                </div>
+                            </div>
+							 <div class="eight wide column">
+                                <div class="ui green segment" style="margin-top: 20px; border-radius: 0; box-shadow: none">
+                                    <div class="ui tiny header"><i class="hashtag icon"></i>Communication</div>
+										<div class="field">
+											<label>
+												CAN Bus ID
+												<i class="help circle icon link" data-content="CAN Bus ID for communicating with other devices such as ESCs." data-offset="-12"></i>
+											</label>
+											<div class="ui right labeled input">
+												<input name="CANDeviceID" class="config-field" type="number">
+													<div class="ui basic label">
+													-
+													</div>
+											</div>
+										</div>
                                 </div>
                             </div>
                         </div>

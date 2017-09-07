@@ -243,9 +243,31 @@ $(function() {
             else if (data.fault == 32)
                 $('#status .content .sub.header').text('Status: Fault (Short)');
         }
-        else if (data.charging)
+    	else if (data.warning > 0)
         {
             $('#status i').attr("class", "orange circle icon");
+            if (data.warning == 1)
+                $('#status .content .sub.header').text('Status: Warning (Cell Low)');
+            else if (data.warning == 2)
+                $('#status .content .sub.header').text('Status: Warning (Cell High)');
+            else if (data.warning == 4)
+                $('#status .content .sub.header').text('Status: Warning (Battery Undervoltage)');
+            else if (data.warning == 8)
+                $('#status .content .sub.header').text('Status: Warning (Battery Overvoltage)');
+            else if (data.warning == 16)
+                $('#status .content .sub.header').text('Status: Warning (Overcurrent)');
+            else if (data.warning == 32)
+                $('#status .content .sub.header').text('Status: Warning (Battery Temperature)');
+			else if (data.warning == 64)
+                $('#status .content .sub.header').text('Status: Warning (Board Temperature)');
+			else if (data.warning == 128)
+                $('#status .content .sub.header').text('Status: Warning (LTC6803 Temperature)');
+			else if (data.warning == 256)
+                $('#status .content .sub.header').text('Status: Warning (LTC6803 Error)');
+        }
+		else if (data.charging)
+        {
+            $('#status i').attr("class", "blue circle icon");
             $('#status .content .sub.header').text('Status: Charging');
         }
         else
