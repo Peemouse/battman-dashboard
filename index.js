@@ -114,7 +114,7 @@ io.on('connection', function(socket) {
                 ["numCells", "uint8", 1],
                 ["fullCellVoltage", "float", 4],
                 ["emptyCellVoltage", "float", 4],
-                ["packCapacity", "float", 4],
+				["packCapacity", "float", 4],
                 ["lowVoltageCutoff", "float", 4],
                 ["lowVoltageWarning", "float", 4],
                 ["highVoltageCutoff", "float", 4],
@@ -134,7 +134,11 @@ io.on('connection', function(socket) {
                 ["prechargeTimeout", "uint16", 2],
                 ["balanceStartVoltage", "float", 4],
                 ["balanceDifferenceThreshold", "float", 4],
-                ["chargerDisconnectShutdown", "bool", 1]
+                ["chargerDisconnectShutdown", "bool", 1],
+                ["tempBoardWarning", "float", 4],
+                ["tempBoardCutoff", "float", 4],
+                ["isBattTempSensor", "bool", 1],
+				["enBuzzer", "bool", 1],
             ];
             var Config = {
                 FieldToID: {},
@@ -528,7 +532,9 @@ io.on('connection', function(socket) {
                             var current = fb.fromInt(values.getInt32(8, false)).toFixed(2);
                             var chargeVoltage = fb.fromInt(values.getInt32(12, false)).toFixed(2);
                             var faults = values.getUint8(16);
-                            var charging = values.getUint8(17) == 1 ? true : false;
+                            var warnings = values.getUint16(17);
+                            var powerStatus = values.getUint8(19);
+                            var charging = values.getUint8(20) == 1 ? true : false;
                             //var state = uint8[5];
                             //var fault = uint8[7];
                             data = {current: current, charge_voltage: chargeVoltage};

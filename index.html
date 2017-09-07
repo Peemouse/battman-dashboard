@@ -1,0 +1,580 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Battman Dashboard</title>
+        <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+        <link rel="stylesheet" type="text/css" href="rickshaw/rickshaw.min.css">
+        <link rel="stylesheet" type="text/css" href="weather-icons/css/weather-icons.min.css">
+        <link rel="stylesheet" type="text/css" href="battman-font/css/battman.css">
+        <link rel="stylesheet" type="text/css" href="electric-font/css/electric.css">
+        <link rel="stylesheet" type="text/css" href="circuit-font/style.css">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+        <link rel="manifest" href="/manifest.json">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="theme-color" content="#ffffff">
+        <script src="jquery-1.10.2.min.js"></script>
+        <script src="jquery.form.min.js"></script>
+        <script src="semantic/dist/semantic.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="rickshaw/vendor/d3.min.js"></script>
+        <script src="rickshaw/vendor/d3.layout.min.js"></script>
+        <script src="rickshaw/rickshaw.min.js"></script>
+        <script src="client.js"></script>
+    </head>
+    <body>
+        <div id="header" class="ui bottom attached inverted segment">
+            <div id="headerwrap" class="ui container">
+                <h1 id="logo" class="ui inverted header"><i class="icon icon-battman" style="margin-top: -3px; margin-right: 4px; font-size: 30pt"></i>battman</h1>
+                <div class="ui divider" style="margin: 0"></div>
+                <div id="menu" class="ui inverted secondary pointing menu" style="border: none; padding-bottom: 2px">
+                    <a class="item active" data-tab="overview"><i class="dashboard icon"></i> Overview</a>
+                    <a class="item" data-tab="battery"><i class="icon-electric-battery icon"></i> Battery Settings</a>
+                    <a class="item" data-tab="accessory"><i class="plug icon"></i> Accessory Settings</a>
+                    <a class="item" data-tab="misc"><i class="options icon"></i> Miscellaneous Settings</a>
+                    <a class="item" data-tab="data"><i class="line chart icon"></i> Data Visualization</a>
+                    <a class="item" data-tab="console"><i class="terminal icon"></i> Console</a>
+                </div>
+            </div>
+        </div>
+        <div id="container" class="ui container">
+            <div class="ui grid">
+                <div class="twelve wide column">
+                    <div class="ui attached green tab segment active" data-tab="overview">
+                    </div>
+                    <div class="ui tab grid" data-tab="battery">
+                        <div class="stretched row">
+                            <div class="two wide column">
+                                <div class="ui secondary vertical labeled icon menu">
+                                    <a class="item active" data-tab="pack" style="padding-left: 2px; padding-right: 2px"><i class="icon-electric-battery icon"></i>Battery Pack</a>
+                                    <!--<a class="item" data-tab="limits"><i class="protect icon"></i>Limits</a>-->
+                                    <a class="item" data-tab="charging"><i class="lightning icon"></i>Charging</a>
+                                    <!--<a class="item" data-tab="balancing"><i class="law icon"></i>Balancing</a>-->
+                                    <a class="item" data-tab="power"><i class="power icon"></i>Power</a>
+                                </div>
+                            </div>
+                            <div class="fourteen wide column">
+                                <div class="ui tab grid active" data-tab="pack">
+                                    <div class="stretched row">
+                                        <div class="eight wide column">
+                                            <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                                <div class="ui tiny header"><i class="setting icon"></i>Pack Configuration</div>
+                                                <div class="ui form">
+                                                    <div class="field">
+                                                        <label>
+                                                            Number of Cells
+                                                            <i class="help circle icon link" data-content="The number of cells in series in the battery pack." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui input">
+                                                            <input name="numCells" class="config-field" type="number">
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Pack Capacity
+                                                            <i class="help circle icon link" data-content="The nominal total capacity of the battery pack, in mAh." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="packCapacity" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                mAh
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Cell Full Voltage
+                                                            <i class="help circle icon link" data-content="Voltage of a cell when fully charged, for example 4.2V for LiPo batteries." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="fullCellVoltage" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Cell Empty Voltage
+                                                            <i class="help circle icon link" data-content="Voltage of a cell when fully discharged. This is not necessarily the low voltage cutoff." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="emptyCellVoltage" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="eight wide column">
+                                            <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                                <div class="ui tiny header"><i class="battery medium icon"></i>Voltage Limits</div>
+                                                <div class="ui form">
+                                                    <div class="field">
+                                                        <label>
+                                                            Cell High Voltage Cutoff
+                                                            <i class="help circle icon link" data-content="The highest cell voltage before the output is disabled." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="highVoltageCutoff" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Cell High Voltage Warning
+                                                            <i class="help circle icon link" data-content="The cell voltage at which a cell overvoltage warning will be displayed." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="highVoltageWarning" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Cell Low Voltage Warning
+                                                            <i class="help circle icon link" data-content="The cell voltage at which a cell undervoltage warning will be displayed." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="lowVoltageWarning" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Cell Low Voltage Cutoff
+                                                            <i class="help circle icon link" data-content="The lowest cell voltage at which the output is disabled." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="lowVoltageCutoff" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+									<div class="stretched row">
+										<div class="eight wide column">
+											<div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+												<div class="ui tiny header"><i class="protect icon"></i>Current Limits</div>
+												<div class="ui form">
+													<div class="field">
+														<label>
+															Maximum Discharge Current Cutoff
+															<i class="help circle icon link" data-content="The maximum discharge current that can be delivered to the load before the output is disabled." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="maxCurrentCutoff" class="config-field" type="number">
+															<div class="ui basic label">
+																A
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Maximum Continuous Discharge Current
+															<i class="help circle icon link" data-content="The maximum current allowed to be delivered to the load for an indefinite amount of time." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="maxContinuousCurrent" class="config-field" type="number">
+															<div class="ui basic label">
+																A
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Continuous Current Exceeding Cutoff Time
+															<i class="help circle icon link" data-content="The amount of time that the current is allowed to exceed the maximum continuous current before the output is disabled." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="continuousCurrentCutoffTime" class="config-field" type="number">
+															<div class="ui basic label">
+																Seconds
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Continuous Current Exceeding Warning Time
+															<i class="help circle icon link" data-content="The amount of time that the current is allowed to exceed the maximum continuous current before a warning is displayed.." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="continuousCurrentCutoffWarning" class="config-field" type="number">
+															<div class="ui basic label">
+																Seconds
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Maximum Charge Current
+															<i class="help circle icon link" data-content="The maximum current that can be delivered into the battery from charging or regeneration before a warning is displayed." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="maxChargeCurrent" class="config-field" type="number">
+															<div class="ui basic label">
+																A
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									
+										<div class="eight wide column">
+											<div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+												<div class="ui tiny header"><i class="fire icon"></i>Temperatures Limits</div>
+												<div class="ui form">
+													<div class="field">
+														<label>
+															Board Temperature Warning
+															<i class="help circle icon link" data-content="If the board temperature reaches this temperature, a warning is triggered." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBoardWarning" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Board Temperature Cutoff
+															<i class="help circle icon link" data-content="If the board temperature reaches this temperature, the discharge is cut off." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBoardCutoff" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<div class="ui toogle checkbox">
+														<input class="config-field" type="checkbox" name="isTempSensor" tabindex="0" class="hidden">
+														<label>Battery Temperature sensor connected</label>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Battery Temperature Warning
+															<i class="help circle icon link" data-content="If the battery temperature reaches this temperature, a warning is triggered." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBattWarning" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+													<div class="field">
+														<label>
+															Battery Temperature Cutoff
+															<i class="help circle icon link" data-content="If the battery temperature reaches this temperature, the discharge is cut off." data-offset="-12"></i>
+														</label>
+														<div class="ui right labeled input">
+															<input name="tempBattCutoff" class="config-field" type="number">
+															<div class="ui basic label">
+																&#8451
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+                                </div>
+                                <!--<div class="ui tab grid" style="margin-top: 0" data-tab="limits">-->
+                                <!--</div>-->
+                                <div class="ui tab grid" style="margin-top: 0" data-tab="charging">
+                                    <div class="stretched row" style="padding-top: 0">
+                                        <div class="eight wide column">
+                                            <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                                <div class="ui tiny header"><i class="lightning icon"></i>Charge Settings</div>
+                                                <div class="ui form">
+                                                    <div class="grouped fields">
+                                                        <label for="chargeMode">
+                                                            Charge Mode
+                                                            <i class="help circle icon link" data-content="Charge Mode." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="field">
+                                                            <div class="ui radio checkbox">
+                                                                <input class="config-field" type="radio" name="chargeMode" tabindex="0" value="0" class="hidden">
+                                                                <label>Current Controlled</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="field">
+                                                            <div class="ui radio checkbox">
+                                                                <input class="config-field" type="radio" name="chargeMode" tabindex="0" value="1" class="hidden">
+                                                                <label>Full Current</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="field">
+                                                            <div class="ui radio checkbox">
+                                                                <input class="config-field" type="radio" name="chargeMode" tabindex="0" value="2" class="hidden">
+                                                                <label>Bypass (CC)</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="field">
+                                                            <div class="ui radio checkbox">
+                                                                <input class="config-field" type="radio" name="chargeMode" tabindex="0" value="3" class="hidden">
+                                                                <label>Bypass (CC/CV)</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Charge Voltage
+                                                            <i class="help circle icon link" data-content="The voltage to charge the battery pack to." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="chargeVoltage" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Charge Current
+                                                            <i class="help circle icon link" data-content="The current to charge the battery pack at." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="chargeCurrent" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                A
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="eight wide column">
+                                            <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                                <div class="ui tiny header"><i class="law icon"></i>Cell Balancing</div>
+                                                <div class="ui form">
+                                                    <div class="field">
+                                                        <label>
+                                                            Balance Start Voltage
+                                                            <i class="help circle icon link" data-content="The cell voltage at which cell balancing will be activated." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="balanceStartVoltage" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Cell Voltage Difference Threshold
+                                                            <i class="help circle icon link" data-content="The threshold for the difference between the voltage of a cell and the lowest cell for which that cell will be discharged." data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="balanceDifferenceThreshold" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                V
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--<div class="ui tab grid" style="margin-top: 0" data-tab="balancing">-->
+                                <!--</div>-->
+                                <div class="ui tab grid" style="margin-top: 0" data-tab="power">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui tab grid" data-tab="accessory">
+                        <div class="stretched row">
+                        <div class="eight wide column">
+                        <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                        </div>
+                        </div>
+                        <div class="eight wide column">
+                        <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="ui tab grid" data-tab="misc" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                        <div class="stretched row" style="padding-top: 0">
+                            <div class="eight wide column">
+                                <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                    <div class="ui tiny header"><i class="wait icon"></i>Real-time Clock</div>
+                                </div>
+                            </div>
+                            <div class="eight wide column">
+                                <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                    <div class="ui tiny header"><i class="volume up icon"></i>Buzzer Settings</div>
+										<div class="field">
+											<div class="ui toogle checkbox">
+												<input class="config-field" type="checkbox" name="enBuzzer" tabindex="0" class="hidden">
+												<label>Enable Buzzer</label>
+											</div>
+										</div>
+										
+                                </div>
+                            </div>
+							 <div class="eight wide column">
+                                <div class="ui green segment" style="margin-top: 20px; border-radius: 0; box-shadow: none">
+                                    <div class="ui tiny header"><i class="hashtag icon"></i>Communication</div>
+										<div class="field">
+											<label>
+												CAN Bus ID
+												<i class="help circle icon link" data-content="CAN Bus ID for communicating with other devices such as ESCs." data-offset="-12"></i>
+											</label>
+											<div class="ui right labeled input">
+												<input name="CANDeviceID" class="config-field" type="number">
+													<div class="ui basic label">
+													-
+													</div>
+											</div>
+										</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui tab grid" data-tab="data" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                        <div class="stretched row" style="padding-top: 0">
+                            <div class="two wide column">
+                                <div class="ui secondary vertical labeled icon menu">
+                                    <a class="item active" data-tab="plots"><i class="heartbeat icon"></i>Real-time Data</a>
+                                    <a class="item" data-tab="cells"><i class="bar chart icon"></i>Cell Voltages</a>
+                                    <a class="item" data-tab="logs"><i class="line chart icon"></i>Log Plots</a>
+                                </div>
+                            </div>
+                            <div class="fourteen wide column">
+                                <div class="ui tab grid active" data-tab="plots">
+                                    <div class="stretched row">
+                                        <div class="sixteen wide column">
+                                        <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                            <div id="y_axis_left"></div>
+                                            <div id="graph"></div>
+                                            <div id="y_axis_right"></div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui tab grid" style="margin-top: 0" data-tab="cells">
+                                    <div class="stretched row" style="padding-top: 0">
+                                        <div class="sixteen wide column">
+                                        <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                            <div id="y_axis_bar"></div>
+                                            <div id="bargraph"></div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui tab grid" style="margin-top: 0" data-tab="logs">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui green tab segment" data-tab="console" style="margin-top: 0; border-radius: 0; box-shadow: none; margin-bottom: 1rem">
+                        <div id="console" tabindex="0">
+                            <div id="output"></div>
+                            <div id="cmd"><span id="input"><span class="cursor noblink">&nbsp;</span></span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="four wide column">
+                    <div class="ui attached olive segment" style="border-top: 2px solid #B5DD58">
+                        <div class="ui grid">
+                            <div class="sixteen wide column">
+                                <div class="ui fluid selection dropdown" id="ports" style="margin-bottom: 0.73em">
+                                    <i class="usb icon"></i>
+                                    <span id="select-port" class="text">Select Port...</span>
+                                    <i class="dropdown icon" style="background-color: white"></i>
+                                    <div class="menu"></div>
+                                </div>
+                                <div class="ui basic buttons">
+                                <div class="ui button" id="connect"><i class="plug icon"></i><span>Connect</span></div><div class="ui icon button" id="listports"><i class="refresh icon"></i></div>
+                                </div>
+                            </div>
+                            <div class="sixteen wide column">
+                                <h4 id="status" class="ui header"><i class="grey circle icon" style="font-size: 2em; width: 30px"></i><div class="content">Not Connected<div class="sub header"></div></div></h4>
+                                <div class="ui relaxed list">
+                                    <div class="item">
+                                        <i class="tag middle aligned icon"></i>
+                                        <div class="content">
+                                            Firmware Version: <span id="version">0.0</span> (<a id="firmware-update-button">Update</a>)
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <i class="lightning middle aligned icon"></i>
+                                        <div class="content">
+                                            Battery Voltage: <span id="voltage">0.0</span>V
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <i class="wi wi-thermometer middle aligned icon" style="font-family: weathericons"></i>
+                                        <div class="content">
+                                            Board Temperature: <span id="temperature">0.0</span>&#8451;
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--<input type="range" id="duty" min="0" max="10000" value="0">-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="footer" class="ui horizontal divider" style="margin-top: 15px"><i class="icon icon-battman" id="footer-logo"></i></div>
+            <div id="firmware-update" class="ui small modal" style="text-align: center; width: 600px; margin: 0 0 0 -300px">
+                <div class="ui header">
+                    <i class="refresh icon"></i>
+                    <div class="content">Firmware Update</div>
+                </div>
+                <div class="content">
+                    <form id="upload-form"
+                        enctype="multipart/form-data"
+                        action="/update"
+                        method="post" style="position: absolute; left: 0; right: 0">
+                        <button id="upload" class="ui positive button" type="button">
+                            <i class="upload icon"></i>
+                            Upload Firmware 
+                        </button>
+                        <button id="check-online" class="ui blue button" type="button">
+                            <i class="world icon"></i>
+                            Check for Updates
+                        </button>
+                        <input type="file" name="firmware" id="upload-input" accept=".bin" style="visibility: hidden; width: 0" />
+                    </form>
+
+                    <div id="update-progress" class="ui active progress" style="opacity: 0; position: relative; z-index: -100">
+                        <div class="bar">
+                            <div class="progress"></div>
+                        </div>
+                        <div id="update-status" class="label">Uploading firmware...</div>
+                    </div>
+                </div>
+                <div class="actions" style="text-align: right">
+                    <div id="update-button" class="ui black deny button">
+                        Cancel
+                    </div>
+                </div>
+            </div>
+            <div id="disconnect" class="ui basic small modal" style="text-align: center">
+                <h1 class="ui header" style="margin: 0 auto; display: inline-block; text-align: left"><i class="warning sign icon" style="font-size: 40pt"></i><div class="content" style="font-size: 16pt">Server Connection Lost<div class="sub header" style="color: white">Please restart the server.</div></div></h1>
+            </div>
+    </body>
+</html>
