@@ -3,7 +3,7 @@
     <head>
         <title>Battman Dashboard</title>
         <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
-        <link rel="stylesheet" type="text/css" href="rickshaw/rickshaw.min.css">
+        <!-- <link rel="stylesheet" type="text/css" href="rickshaw/rickshaw.min.css"> -->
         <link rel="stylesheet" type="text/css" href="weather-icons/css/weather-icons.min.css">
         <link rel="stylesheet" type="text/css" href="battman-font/css/battman.css">
         <link rel="stylesheet" type="text/css" href="electric-font/css/electric.css">
@@ -22,6 +22,8 @@
         <script src="rickshaw/vendor/d3.min.js"></script>
         <script src="rickshaw/vendor/d3.layout.min.js"></script>
         <script src="rickshaw/rickshaw.min.js"></script>
+        <script src="chart.js/dist/Chart.bundle.js"></script>
+        <script src="chart.js/utils.js"></script>
         <script src="client.js"></script>
     </head>
     <body>
@@ -42,8 +44,20 @@
         <div id="container" class="ui container">
             <div class="ui grid">
                 <div class="twelve wide column">
-                    <div class="ui attached green tab segment active" data-tab="overview">
-                    </div>
+                    <div class="ui tab grid" data-tab="overview">
+                    	<div class="stretched row">
+							<label>
+								Power 
+								<i class="help circle icon link" data-content="Power status : 0=Standby, 1=Discharging, 2=Charging, 3=Precharging" data-offset="-12"></i>
+							</label>
+							<h4 id="powerStatus" class="ui header"><i class="ui grey label" style="font-size: 2em; width: 30px"></i><div class="content"Unknown<div class="sub header"></div></div></h4>
+							<div class="ui green label">Standby</div>
+							<div class="ui yellow label">Discharging</div>
+							<div class="ui blue label">Charging</div>
+							<div class="ui purple label">Precharging</div>
+							<br>
+							<span id="powerStatus">0</span>
+						</div>
                     <div class="ui tab grid" data-tab="battery">
                         <div class="stretched row">
                             <div class="two wide column">
@@ -399,6 +413,78 @@
                                 <!--<div class="ui tab grid" style="margin-top: 0" data-tab="balancing">-->
                                 <!--</div>-->
                                 <div class="ui tab grid" style="margin-top: 0" data-tab="power">
+                                    <div class="stretched row" style="padding-top: 0">
+                                        <div class="eight wide column">
+                                            <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                                <div class="ui tiny header"><i class="hotel icon"></i>Sleep mode</div>
+                                                <div class="ui form">
+                                                	<div class="field">
+														<div class="ui toogle checkbox">
+															<input class="config-field" type="checkbox" name="enSleepMode" tabindex="0" class="hidden">
+															<label>Enable Sleep Mode</label>
+														</div>
+													</div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Sleep time
+                                                            <i class="help circle icon link" data-content="The BMS shutdown after this amount of time if not used" data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="SleepModeTime" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                min
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="eight wide column">
+                                            <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
+                                                <div class="ui tiny header"><i class="hourglass end icon"></i>Delays</div>
+                                                <div class="ui form">
+                                                	<div class="field">
+                                                        <label>
+                                                            Turn on delay
+                                                            <i class="help circle icon link" data-content="Discharge is activated after this delay" data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="turnOnDelay" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                msec
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Turn off delay
+                                                            <i class="help circle icon link" data-content="Discharge is desactivated after this delay" data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="shutdownDelay" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                msec
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label>
+                                                            Precharging timeout
+                                                            <i class="help circle icon link" data-content="If discharge side voltage does not reach battery pack voltage (with a delta of 5V), the precharge will be nevertheless considered as done after this delay" data-offset="-12"></i>
+                                                        </label>
+                                                        <div class="ui right labeled input">
+                                                            <input name="prechargeTimeout" class="config-field" type="number">
+                                                            <div class="ui basic label">
+                                                                msec
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -478,8 +564,7 @@
                                     <div class="stretched row" style="padding-top: 0">
                                         <div class="sixteen wide column">
                                         <div class="ui green segment" style="margin-top: 0; border-radius: 0; box-shadow: none">
-                                            <div id="y_axis_bar"></div>
-                                            <div id="bargraph"></div>
+                                            <canvas id="cellsChart" width="500" height="500"></canvas>
                                         </div>
                                         </div>
                                     </div>

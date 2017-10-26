@@ -39,17 +39,61 @@ $(function() {
             $("input[name=" + data.field + "]").val(data.value);
         }
     });
+    
     $('.ui.radio.checkbox')
         .checkbox()
         ;
+ 	  
+	var color = Chart.helpers.color;
+	
+	socket.on('cells', function(data) {
+		var barChartData = {
+			labels: ["Cell #1", "Cell #2", "Cell #3", "Cell #4", "Cell #5", "Cell #6", "Cell #7", "Cell #8", "Cell #9", "Cell #10", "Cell #11", "Cell #12"],
+			datasets: [{
+				label: 'Voltage',
+				backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.red,
+				borderWidth: 1,
+				data: [
+					3.84,
+					3.91,
+					3.89,
+					3.87,
+					3.82,
+					3.83,
+					3.85,
+					3.90,
+					3.84,
+					3.92,
+					3.90,
+					3.87
+				]
+			}]
+		};		
+		
+		var ctx = document.getElementById("cellsGraph").getContext("2d");
+		window.myBar = new Chart(ctx, {
+			type: 'bar',
+			data: barChartData,
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Cells voltage'
+				}
+			}
+		});
+	});
 
-    var scale1 = d3.scale.linear().domain([-2, 2]).nice();
+   /* 
+ var scale1 = d3.scale.linear().domain([-2, 2]).nice();
     var scale2 = d3.scale.linear().domain([-5000, 5000]).nice();
     var series = new Rickshaw.Series.FixedDuration([{ name: 'current', color: 'blue', scale: scale1}, {name: 'charge_voltage', color: 'green', scale: scale1}], undefined, {
 	timeInterval: 100,
 	timeBase: new Date().getTime() / 1000,
 	maxDataPoints: 250
     });
+    
     var graph = new Rickshaw.Graph({
 	element: $("#graph")[0],
 	width: $("#graph").parent().width() - 60,
@@ -57,6 +101,7 @@ $(function() {
         renderer: 'line',
         series: series,
         min: 'auto'
+        
     });
     var y_ticks = new Rickshaw.Graph.Axis.Y.Scaled( {
         graph: graph,
@@ -107,6 +152,7 @@ $(function() {
     });
 
     bargraph.render();
+
     socket.on('cells', function(data) {
         data.forEach(function(element, index) {
             var y = parseFloat(data[index].y);
@@ -119,6 +165,7 @@ $(function() {
             bargraph.configure({width: $("#bargraph").parent().width() - 60, height: 400});
         bargraph.update();
     });
+ */
 
     $("#disconnect").modal({closable: false});
     socket.on('disconnect', function(){
@@ -172,16 +219,18 @@ $(function() {
     });
 
     socket.on('list ports', function(list) {
-        $('#ports .menu').empty();
-        list.list.forEach(function(port) {
-            var option = $('<div class="item" value="' + port.comName + '"><div class="text">' + port.comName + '</div><div class="description" style="float: none; margin: 0; margin-top: 4px">' + port.manufacturer.split(' ')[0] + ' v' + port.serialNumber + '</div></div>');
-            $('#ports .menu').append(option);
-        });
-        if (list.list.indexOf($('#ports').dropdown('get value')) == -1)
-        {
-            $('#ports').dropdown('set value', '');
-            $('#ports #select-port').text("Select Port...");
-        }
+    	if (!connected) {
+			$('#ports .menu').empty();
+			list.list.forEach(function(port) {
+				var option = $('<div class="item" value="' + port.comName + '"><div class="text">' + port.comName + '</div><div class="description" style="float: none; margin: 0; margin-top: 4px">' + port.manufacturer.split(' ')[0] + ' v' + port.serialNumber + '</div></div>');
+				$('#ports .menu').append(option);
+			});
+			if (list.list.indexOf($('#ports').dropdown('get value')) == -1)
+			{
+				$('#ports').dropdown('set value', '');
+				$('#ports #select-port').text("Select Port...");
+			}
+		}
     });
     socket.on('connect port', function() {
         connected = true;
@@ -231,17 +280,21 @@ $(function() {
         {
             $('#status i').attr("class", "red circle icon");
             if (data.fault == 1)
-                $('#status .content .sub.header').text('Status: Fault (Undervoltage)');
-            else if (data.fault == 2)
-                $('#status .content .sub.header').text('Status: Fault (Overvoltage)');
-            else if (data.fault == 4)
-                $('#status .content .sub.header').text('Status: Fault (Overcurrent)');
-            else if (data.fault == 8)
-                $('#status .content .sub.header').text('Status: Fault (Battery Temperature)');
-            else if (data.fault == 16)
-                $('#status .content .sub.header').text('Status: Fault (Board Temperature)');
-            else if (data.fault == 32)
-                $('#status .content .sub.header').text('Status: Fault (Short)');
+                $('#status .content .sub.header').text('Status: Fault (Cell Undervoltage)');
+            if (data.fault == 2)
+                $('#status .content .sub.header').text('Status: Fault (Cell Overvoltage)');
+            if (data.fault == 4)
+                $('#status .content .sub.header').text('Status: Fault (Batt. Undervoltage)');
+            if (data.fault == 8)
+                $('#status .content .sub.header').text('Status: Fault (Batt. Overvoltage)');
+            if (data.fault == 16)
+                $('#status .content .sub.header').text('Status: Fault (Overcurrent');
+            if (data.fault == 32)
+                $('#status .content .sub.header').text('Status: Fault (Batt. temp.)');
+        	if (data.fault == 64)
+                $('#status .content .sub.header').text('Status: Fault (Batt. temp.)');
+            if (data.fault == 128)
+                $('#status .content .sub.header').text('Status: Fault (Output short)');
         }
     	else if (data.warning > 0)
         {
@@ -276,7 +329,18 @@ $(function() {
             $('#status .content .sub.header').text('Status: Idle');
         }
     });
-
+	socket.on('powerstatus_update', function(data) {
+        if (data.charging)
+        {
+            $('#status i').attr("class", "blue circle icon");
+            $('#status .content .sub.header').text('Status: Charging');
+        }
+        else
+        {
+            $('#status i').attr("class", "green circle icon");
+            $('#status .content .sub.header').text('Status: Idle');
+        }
+    });
     $('.menu .item')
         .tab()
         ;
@@ -293,7 +357,9 @@ $(function() {
                 }
             }
         })
-    ;
+    	;
+    	
+/* 
     $('#duty').on('change', function()
     {
         socket.emit('set duty', $('#duty').val());
@@ -461,6 +527,7 @@ $(function() {
         $('#motor-linkage-icon').stop();
         $('#motor-linkage-icon').fadeTo(200, 0.5);
     });
+ */
     $('.help.circle.icon')
         .popup(
                 {on: 'click'}
@@ -558,11 +625,13 @@ $(function() {
             }
         }
     });
+    
     var history = [];
     var inputReset = '<span>battman>&nbsp;</span><span id="input"><span class="cursor">&nbsp;</span></span>';
     var historyIndex = 0;
     var currentCommand;
     var cursor = $(".cursor");
+    
     $("#console").bind("keypress", function(e) {
         if (waiting || !connected)
         {
