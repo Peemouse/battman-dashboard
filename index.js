@@ -134,11 +134,15 @@ io.on('connection', function(socket) {
                 ["prechargeTimeout", "uint16", 2],
                 ["balanceStartVoltage", "float", 4],
                 ["balanceDifferenceThreshold", "float", 4],
-                ["chargerDisconnectShutdown", "bool", 1],
                 ["tempBoardWarning", "float", 4],
                 ["tempBoardCutoff", "float", 4],
+                ["tempBattWarning", "float", 4],
+                ["tempBattCutoff", "float", 4],
+                ["SleepModeTime", "uint8", 1],
+                ["chargerDisconnectShutdown", "bool", 1],
                 ["isBattTempSensor", "bool", 1],
 				["enBuzzer", "bool", 1],
+				["enSleepMode", "bool", 1]
             ];
             var Config = {
                 FieldToID: {},
@@ -454,6 +458,10 @@ io.on('connection', function(socket) {
                         databuf = new Buffer(4);
                         databuf.writeUInt32BE(fb.toUint(data.value));
                         break;
+                    case "bool":
+                        databuf = new Buffer(1);
+                        databuf[0] = data.value == true ? 1 : 0;
+                        break;
                 }
                 var send = bufferToPacket(Cmd.PACKET_CONFIG_SET_FIELD, Buffer.concat([idbuf, databuf]));
                 console.log(send);
@@ -518,6 +526,9 @@ io.on('connection', function(socket) {
                                     var array = new DataView(uint8.buffer.slice(2)).getUint32(0, false);
                                     value = fb.fromUint(array).toFixed(2);
                                     break;
+                                case "bool":
+                                    value = uint8[2] == 1 ? true : false;
+                                    break;
                             }
                             socket.emit('config change', {field: Config.IDToField[id], value: value});
                         }
@@ -526,21 +537,35 @@ io.on('connection', function(socket) {
                             //if (data.slice(1).length % 4 != 0)
                                 //return;
                             var uint8 = new Uint8Array(data.slice(1));
+                            console.log(uint8);
                             var values = new DataView(uint8.buffer);
-                            var voltage = fb.fromInt(values.getInt32(0, false)).toFixed(2);
-                            var temp = fb.fromInt(values.getInt32(4, false)).toFixed(2);
-                            var current = fb.fromInt(values.getInt32(8, false)).toFixed(2);
-                            var chargeVoltage = fb.fromInt(values.getInt32(12, false)).toFixed(2);
-                            var faults = values.getUint8(16);
-                            var warnings = values.getUint16(17);
-                            var powerStatus = values.getUint8(19);
-                            var charging = values.getUint8(20) == 1 ? true : false;
-                            //var state = uint8[5];
-                            //var fault = uint8[7];
-                            data = {current: current, charge_voltage: chargeVoltage};
+                            var voltage = fb.fromInt(values.getInt32(0, false)).toFixed(1);
+                            console.log('voltage ', voltage);
+                            var pcbTemp = fb.fromInt(values.getInt32(4, false)).toFixed(1);
+                            console.log('pcbTemp ', pcbTemp);
+                            var battTemp = fb.fromInt(values.getInt32(8, false)).toFixed(1);
+                            console.log('battTemp ', battTemp);
+                            var current = fb.fromInt(values.getInt32(12, false)).toFixed(1);
+                            console.log('current ', current);
+                            var dischargeVoltage = fb.fromInt(values.getInt32(16, false)).toFixed(1);
+                            console.log('dischargeVoltage ', dischargeVoltage);
+                            var chgInVoltage = fb.fromInt(values.getInt32(20, false)).toFixed(1);
+                            console.log('chargerInputVoltage ', chgInVoltage);
+                            var chgOutVoltage = fb.fromInt(values.getInt32(24, false)).toFixed(1);
+                            console.log('chargerOutputVoltage ', chgOutVoltage);
+                            var faults = values.getUint8(28);
+                            console.log('faults  ', faults);
+                            var warnings = values.getUint16(29);
+                            console.log('warnings ', warnings);
+                            var powerStatus = values.getUint8(31);
+                            console.log('powerstatus ', powerStatus);
+                            var charging = values.getUint8(32) == 1 ? true : false;
+                            console.log('charging ', charging);
+                            
+                            data = {current: current, output_voltage: chgOutVoltage};
                             socket.emit('graph', data);
                             socket.emit('voltage', voltage);
-                            socket.emit('temperature', temp);
+                            socket.emit('temperature', pcbTemp);
                             socket.emit('status_update', {charging: charging, fault: faults});
                         }
                         else if (data[0] == Cmd.PACKET_GET_CELLS)
@@ -551,9 +576,10 @@ io.on('connection', function(socket) {
                             var uint8 = new Uint8Array(data.slice(1));
                             var values = new DataView(uint8.buffer);
                             data = [];
-                            for (c = 0; c < numCells; c++)
+							for (c = 0; c < numCells; c++)
                             {
                                 data.push({x: c, y: fb.fromInt(values.getInt32(0, false)).toFixed(4)});
+                                console.log('cell ', c+1, ' ', data);
                             }
                             if (data.length > 0)
                                 socket.emit('cells', data);
@@ -563,7 +589,9 @@ io.on('connection', function(socket) {
                             // In little endian, assumes configTable matches config struct in firmware
                             var configStruct = new Uint8Array(data.slice(1));
                             if (configStruct.length != configSize)
-                                return;
+                            	return;
+                            	//console.log(configStruct);
+                                
                             var currIndex = 0;
                             for (j = 0; j < configTable.length; j++)
                             {
